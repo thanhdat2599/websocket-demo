@@ -19,7 +19,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     private RedissonClient redissonClient;
 
     @Value("${spring.redis.topic:'datdt'}")
-    private String value;
+    private String topicName;
 
     @Value("${spring.redis.enabled:false}")
     private boolean redisEnabled;
@@ -27,7 +27,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         if (redisEnabled) {
-            RTopic topic = redissonClient.getTopic(value, StringCodec.INSTANCE);
+            RTopic topic = redissonClient.getTopic(topicName, StringCodec.INSTANCE);
             topic.publish(message.getPayload());
         } else {
             String payload = message.getPayload();
@@ -38,7 +38,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         if (redisEnabled) {
-            RTopic topic = redissonClient.getTopic(value, StringCodec.INSTANCE);
+            RTopic topic = redissonClient.getTopic(topicName, StringCodec.INSTANCE);
             int regId = topic.addListener(String.class, (channel, msg) -> {
                 try {
                     log.info("send to channel +: " + channel + " message: " + handleMessage(msg));
