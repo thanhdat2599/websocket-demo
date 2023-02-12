@@ -1,0 +1,7 @@
+spring:
+  redis:
+    enabled: false
+    host: localhost
+    port: '6379'
+    timeout: 86400000
+    connection-pool-size: 64
